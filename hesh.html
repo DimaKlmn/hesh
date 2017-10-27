@@ -1,0 +1,110 @@
+
+<meta charset="utf-8">
+<script>
+
+var str = (prompt('Vvedite tekst'));
+		
+var chars = []; // создаем пустой массив
+for (i = 0; i < str.length; i++) { // переписываем коды символов
+    chars[i] = str.charCodeAt(i);
+}
+
+console.log(chars);
+
+var len = str.length; // длина входного текста
+var min = 64; //минимальное количество символов для дополнения.
+
+while (min < len) {
+	min *= 2;
+}
+
+console.log(min);
+
+if ((min - len) < 64) 
+	min *= 2;  // если количество символов для дополнения меньше 64, то дополняем еще
+
+console.log(min);
+
+var add =  min - len;
+
+console.log(add);
+
+var salt = getCheckSumm(chars);
+
+function getCheckSumm(chars) { // функция контрольной суммы
+  var len =  chars.length;
+  var salt = 0;
+  
+  for (i = 0; i < len; i++) {
+    /*var ch = chars[i];
+    var ch1 = chars[len-i-1];
+    
+    var a =  ch * ch1;
+    var b =  ch / ch1;
+    
+    salt +=  a + b;*/
+
+    var p = Math.pow(chars[i],(i+1)%4);
+
+    salt += chars[i] + (chars[i] * p);
+  }
+
+  return Math.round(salt);
+}
+
+console.log(salt);
+
+function number(x) {
+    x+=256;
+    while (!((( x <= 57) && ( x >= 48)) || (( x <= 90) && ( x >= 65)) || (( x <= 122) && ( x >= 97)))) {
+        if ( x < 48) { x+=24;} else { x-=47;}
+        /*console.log(x);*/
+    }
+    return  x;
+}
+
+salt = number(salt - len);
+
+console.log(salt);
+
+ for (i = 1; i <= add; i++) { //добиваем до нужного кол-ва элементов
+      chars.push(number(i*salt));
+  }
+
+console.log(chars);
+
+for (i = 0; i < chars.length; i++) { // для уникальности
+    chars[i] = chars[i] * salt;
+  }
+
+console.log(chars);
+
+var now = [];
+while (chars.length != 32) {
+	for (j = 0;  j < chars.length;  j += 2) {
+		t = chars[j] +  chars[j+1]; // складываем пары чисел в одно, тем самым уменьшая размер последовательности в 2 раза
+		now.push(t);
+	}
+	
+	chars = now;
+	now = [];
+}
+
+console.log(chars);
+
+for (i = 0; i < chars.length; i++) {
+    chars[i] = number(chars[i] + i*i*salt); //приводим элементы к значениям в диапазоне кодов символов
+}
+
+console.log(chars);
+
+var hash = ''; // строка результата
+for (i = 0; i < chars.length; i++) {
+    hash += String.fromCharCode(chars[i]); //переводим коды символов в символы и записываем в строку
+}
+
+console.log(hash);
+
+alert(hash);
+
+</script>
